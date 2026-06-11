@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
@@ -56,4 +57,12 @@ func main() {
 	// Wait until an interrupt signal hits the terminal
 	<-shutdownChan
 	log.Println("[*] System intercept registered. Terminating operational threads gracefully...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := server.Shutdown(ctx); err != nil {
+		log.Fatalf("[!] Core transport layer shutdown failed: %v", err)
+	}
+	log.Println("[-] Core transport layer gracefully terminated.")
 }
